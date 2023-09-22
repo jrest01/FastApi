@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Body
 from fastapi.responses import HTMLResponse
 
 app = FastAPI()
@@ -16,11 +16,11 @@ movies = [
     } ,
     {
         'id': 2,
-        'title': 'Fast and Furious',
-        'overview': "Fast and Furious",
-        'year': 2009,
-        'rating': 9,
-        'category': 'Acción'    
+        'title': "Fast and Furious",
+         ' overview': "Fast and Furious",
+         ' year': 2009,
+         ' rating': 9,
+         ' category': 'Acción'    
     } ,
     {
         'id': 3,
@@ -62,3 +62,16 @@ def get_movies_by_category(category: str, year: int):
         return[movie for movie in movies if movie['category']==category and movie['year']==year ]
     except print(0):
         pass
+
+@app.post('/movies', tags=['movies'])
+def create_movie(id: int = Body(), title: str = Body(), overview: str = Body(), year: int = Body(), rating: float = Body(), category: str = Body()):
+    new_movie = {
+        'id':id,
+        'title':title,
+        'overview':overview,
+        'year':year,
+        'rating':rating,
+        'category':category,
+    }
+    movies.append(new_movie)
+    return movies

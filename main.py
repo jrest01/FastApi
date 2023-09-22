@@ -1,9 +1,33 @@
 from fastapi import FastAPI, Body
 from fastapi.responses import HTMLResponse
+from pydantic import BaseModel
+from typing import Optional
+
 
 app = FastAPI()
 app.title = "First FastAPI App"
 app.version = '0.0.1'
+
+class Movie(BaseModel):
+    id : Optional[int] = None 
+    title : str
+    overview : str
+    year : int
+    rating : float
+    category : str
+
+    def to_dict(self):
+        dict = {
+        'id': self.id,
+        'title': self.title,
+        'overview': self.overview,
+        'year': self.year,
+        'rating': self.rating,
+        'category': self.category
+        }
+        print(dict)
+        return dict
+
 
 movies = [
     {
@@ -17,10 +41,10 @@ movies = [
     {
         'id': 2,
         'title': "Fast and Furious",
-         ' overview': "Fast and Furious",
-         ' year': 2009,
-         ' rating': 9,
-         ' category': 'Acción'    
+         'overview': "Fast and Furious",
+         'year': 2009,
+         'rating': 9,
+         'category': 'Acción'    
     } ,
     {
         'id': 3,
@@ -64,31 +88,23 @@ def get_movies_by_category(category: str, year: int):
         pass
 
 @app.post('/movies', tags=['movies'])
-def create_movie(id: int = Body(), title: str = Body(), overview: str = Body(), year: int = Body(), rating: float = Body(), category: str = Body()):
-    new_movie = {
-        'id':id,
-        'title':title,
-        'overview':overview,
-        'year':year,
-        'rating':rating,
-        'category':category,
-    }
-    movies.append(new_movie)
+def create_movie(movie: Movie):
+    movies.append(movie.to_dict())
     return movies
 
 
 @app.put('/movies/update/{id}', tags=['movies'])
-def update_movie(id: int, title: str, overview: str, year: int, rating: float, category: str):
+def update_movie(id: int, new_movie: Movie):
     """
         Updates a movie by id
     """
     for movie in movies:
         if movie['id'] == id:
-            movie['title']=title
-            movie['overview']=overview
-            movie['year']=year
-            movie['rating']=rating
-            movie['category']=category
+            movie['title'] = new_movie.title
+            movie['overview'] = new_movie.overview
+            movie['year'] = new_movie.year
+            movie['rating'] = new_movie.rating
+            movie['category'] = new_movie.category
 
     return movies
         

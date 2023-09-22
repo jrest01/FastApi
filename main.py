@@ -77,7 +77,7 @@ def create_movie(id: int = Body(), title: str = Body(), overview: str = Body(), 
     return movies
 
 
-@app.put('/movies/update/{id}')
+@app.put('/movies/update/{id}', tags=['movies'])
 def update_movie(id: int, title: str, overview: str, year: int, rating: float, category: str):
     """
         Updates a movie by id
@@ -89,4 +89,14 @@ def update_movie(id: int, title: str, overview: str, year: int, rating: float, c
             movie['year']=year
             movie['rating']=rating
             movie['category']=category
-            
+
+    return movies
+        
+
+@app.delete('/movies/delete/{id}', tags=['movies'])        
+def delete_movie(id: int):
+    for idx, movie in enumerate(movies):
+        if movie['id'] == id:
+            movies.pop(idx)
+    
+    return movies

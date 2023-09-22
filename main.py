@@ -75,3 +75,18 @@ def create_movie(id: int = Body(), title: str = Body(), overview: str = Body(), 
     }
     movies.append(new_movie)
     return movies
+
+
+@app.put('/movies/update/{id}')
+def update_movie(id: int, title: str, overview: str, year: int, rating: float, category: str):
+    """
+        Updates a movie by id
+    """
+    for movie in movies:
+        if movie['id'] == id:
+            movie['title']=title
+            movie['overview']=overview
+            movie['year']=year
+            movie['rating']=rating
+            movie['category']=category
+            

@@ -1,6 +1,6 @@
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, Path, Query
 from fastapi.responses import HTMLResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 
 
@@ -10,11 +10,26 @@ app.version = '0.0.1'
 
 class Movie(BaseModel):
     id : Optional[int] = None 
-    title : str
-    overview : str
-    year : int
-    rating : float
-    category : str
+    title : str = Field(default = '0000',max_length=20)
+    overview : str = Field(min_length=10, max_length=100)
+    year : int = Field( le=2024, gt=1920)
+    rating : float = Field(ge=1, le=10)
+    category : str = Field(min_length=5, max_length=20)
+    
+    model_config = {
+     "json_schema_extra": {
+            "examples": [
+                {
+                    "id": 999,
+                    "title": "Your movie",
+                    "overview": "Summary",
+                    "year": 2023,
+                    "rating": 5.0,
+                    "category": "Fiction"
+                }
+            ]
+        }
+    }
 
     def to_dict(self):
         dict = {
@@ -27,6 +42,8 @@ class Movie(BaseModel):
         }
         print(dict)
         return dict
+    
+
 
 
 movies = [
@@ -49,7 +66,7 @@ movies = [
     {
         'id': 3,
         'title': 'Top Gun',
-        'overview': "Top Gun",
+        'overview': "Top Gun Warriors",
         'year': 1,
         'rating': 9,
         'category': '1'  
@@ -66,8 +83,8 @@ def get_movies():
     return movies
 
 
-@app.get('/movies/{id}', tags=['movies'])
-def get_movie(movie_id:int):
+@app.get('/movies/{movie_id}', tags=['movies'])
+def get_movie(movie_id:int=Path(ge=1, le=2000)):
     """
         Using route params
     """
@@ -78,7 +95,7 @@ def get_movie(movie_id:int):
     
 
 @app.get('/movies/', tags=['movies'])
-def get_movies_by_category(category: str, year: int):
+def get_movies_by_category(category: str=Query(min_length=5, max_length=20), year: int=Query(ge=1910, le=2024)):
     """
         Using query params
     """

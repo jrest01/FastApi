@@ -1,10 +1,13 @@
-from fastapi import FastAPI, Path, Query
+from fastapi import FastAPI, Path, Query, Depends
 from fastapi.responses import HTMLResponse, JSONResponse
 from typing import  List
 
-from models import Movie
+
+from models import Movie, User, JWTBearer
 from data import movies
 from config import create_config_api
+from jwt_manager import create_token
+
 
 
 app = FastAPI()
@@ -16,7 +19,14 @@ def message():
     return HTMLResponse('<h1>Hello World</h1>')
 
 
-@app.get('/movies', tags=['movies'], response_model=List[Movie], status_code=200)
+@app.post('/login', tags=['auth'])
+def login(user: User):
+    if user.email == 'admin@gmail.com' and user.password == 'admin123':
+        token: str = create_token(user.model_dump())
+        return JSONResponse(status_code=200, content=token)    
+
+
+@app.get('/movies', tags=['movies'], response_model=List[Movie], status_code=200, dependencies=[Depends(JWTBearer())])
 def get_movies() :
     return (JSONResponse(status_code=200, content=movies))
 

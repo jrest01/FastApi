@@ -1,5 +1,10 @@
 from pydantic import BaseModel, Field
+from fastapi import Request, HTTPException
+from fastapi.security import HTTPBearer
 from typing import Optional
+from starlette.requests import Request
+
+from jwt_manager import validate_token
 
 class Movie(BaseModel):
     id : Optional[int] = None 
@@ -36,3 +41,15 @@ class Movie(BaseModel):
         print(dict)
         return dict
     
+
+class User(BaseModel):
+    email: str
+    password: str
+
+
+class JWTBearer(HTTPBearer):
+    async def __call__(self, request: Request):
+        auth = await super().__call__(request)
+        data = validate_token(auth.credentials)
+        if data['email'] != 'admin@gmail.com':
+            raise HTTPException(status_code=403, detail='Invalid Credentials')

@@ -4,10 +4,11 @@ from typing import  List
 from fastapi.encoders import jsonable_encoder
 
 
-from models import  User, JWTBearer, Movie
-from data import movies
+from models import  User, Movie
+from middelwares.error_handler import ErrorHandler
 from config import create_config_api
 from jwt_manager import create_token
+from middelwares.jwt_beater import JWTBearer
 
 from config.database import Base, engine, Session
 from models.movie import Movie as MovieModel
@@ -16,6 +17,8 @@ from models.movie import Movie as MovieModel
 
 app = FastAPI()
 create_config_api(app)
+
+app.add_middleware(ErrorHandler)
 
 Base.metadata.create_all(bind=engine)
 
